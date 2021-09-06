@@ -28,11 +28,13 @@ from yolox.utils import (
     setup_logger,
     synchronize
 )
+from yolox.exp.yolox_base import Exp
 
+import debug_tools as D
 
 class Trainer:
 
-    def __init__(self, exp, args):
+    def __init__(self, exp:Exp, args):
         # init function only defines some basic attr, other attrs like model, optimizer are built in
         # before_train methods.
         self.exp = exp
@@ -74,6 +76,8 @@ class Trainer:
             self.after_train()
 
     def train_in_epoch(self):
+        # 这里before主要是为了在特定轮关闭mixup和mosaic
+        # after是为了使用emp来平滑权重
         for self.epoch in range(self.start_epoch, self.max_epoch):
             self.before_epoch()
             self.train_in_iter()
@@ -89,6 +93,7 @@ class Trainer:
         iter_start_time = time.time()
 
         inps, targets = self.prefetcher.next()
+        breakpoint()
         inps = inps.to(self.data_type)
         targets = targets.to(self.data_type)
         targets.requires_grad = False
@@ -121,6 +126,8 @@ class Trainer:
         )
 
     def before_train(self):
+        """用于设置dataloader,优化器,lr调整策略,amp等
+        """
         logger.info("args: {}".format(self.args))
         logger.info("exp value:\n{}".format(self.exp))
 
@@ -146,6 +153,9 @@ class Trainer:
             is_distributed=self.is_distributed,
             no_aug=self.no_aug
         )
+        a=iter(self.train_loader)
+        b=a.next()
+        breakpoint()
         logger.info("init prefetcher, this might take one minute or less...")
         self.prefetcher = DataPrefetcher(self.train_loader)
         # max_iter means iters per epoch
@@ -191,6 +201,7 @@ class Trainer:
             logger.info("--->No mosaic aug now!")
             self.train_loader.close_mosaic()
             logger.info("--->Add additional L1 loss now!")
+            # QUE: 这里添加L1正则有什么说法?
             if self.is_distributed:
                 self.model.module.head.use_l1 = True
             else:

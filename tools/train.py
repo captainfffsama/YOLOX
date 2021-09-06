@@ -104,13 +104,15 @@ def main(exp, args):
 if __name__ == "__main__":
     args = make_parser().parse_args()
     exp = get_exp(args.exp_file, args.name)
+    # exp  是一个用于管理实验参数以及各种配置的类
     exp.merge(args.opts)
-    breakpoint()
 
     num_gpu = torch.cuda.device_count() if args.devices is None else args.devices
     assert num_gpu <= torch.cuda.device_count()
 
     dist_url = "auto" if args.dist_url is None else args.dist_url
+
+    # launch 其实就是用来区分是不是多卡多进程,单卡的情况下其实就是直接执行了main(args)
     launch(
         main, num_gpu, args.num_machine, backend=args.dist_backend,
         dist_url=dist_url, args=(exp, args)

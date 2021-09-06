@@ -126,6 +126,9 @@ class YOLOXHead(nn.Module):
         self.expanded_strides = [None] * len(in_channels)
 
     def initialize_biases(self, prior_prob):
+        """这里因为方法上用的focal loss,所以需要这样初始化,大致解释可以参照
+            https://zhuanlan.zhihu.com/p/63626711
+        """
         for conv in self.cls_preds:
             b = conv.bias.view(self.n_anchors, -1)
             b.data.fill_(-math.log((1 - prior_prob) / prior_prob))
@@ -193,6 +196,7 @@ class YOLOXHead(nn.Module):
                 return self.decode_outputs(outputs, dtype=xin[0].type())
             else:
                 return outputs
+
 
     def get_output_and_grid(self, output, k, stride, dtype):
         grid = self.grids[k]

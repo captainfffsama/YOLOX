@@ -29,6 +29,7 @@ def copy_attr(a, b, include=(), exclude=()):
             setattr(a, k, v)
 
 
+# TODO:  这里很值得学习一下
 class ModelEMA:
     """
     Model Exponential Moving Average from https://github.com/rwightman/pytorch-image-models

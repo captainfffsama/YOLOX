@@ -10,6 +10,7 @@ import torch.distributed as dist
 from yolox.utils import synchronize
 
 
+# TODO: 这里很值得学习一下,后面细看
 class DataPrefetcher:
     """
     DataPrefetcher is inspired by code of following file:

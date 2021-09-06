@@ -99,6 +99,7 @@ class COCODataset(Dataset):
         assert img is not None
 
         # load anno
+        # res [[xmin, ymin, xmax, ymax,class]]
         res = self.load_anno(index)
         img_info = (height, width)
 

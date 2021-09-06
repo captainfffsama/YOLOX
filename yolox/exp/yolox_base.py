@@ -76,6 +76,7 @@ class Exp(BaseExp):
             self.model = YOLOX(backbone, head)
 
         self.model.apply(init_yolo)
+        # NOTE: 注意这里的的技巧
         self.model.head.initialize_biases(1e-2)
         return self.model
 
@@ -118,6 +119,7 @@ class Exp(BaseExp):
         )
 
         self.dataset = dataset
+        breakpoint()
 
         if is_distributed:
             batch_size = batch_size // dist.get_world_size()
@@ -141,6 +143,9 @@ class Exp(BaseExp):
         return train_loader
 
     def random_resize(self, data_loader, epoch, rank, is_distributed):
+        """这里会直接改变dataloader的输出大小
+
+        """
         tensor = torch.LongTensor(2).cuda()
 
         if rank == 0:
